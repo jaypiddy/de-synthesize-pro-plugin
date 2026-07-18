@@ -1,0 +1,20 @@
+{
+  "name": "de-synthesize-pro",
+  "owner": {
+    "name": "Jay Piddy"
+  },
+  "metadata": {
+    "description": "De-Synthesize Pro — analog film treatment for AI-generated portraits, run through Higgsfield."
+  },
+  "plugins": [
+    {
+      "name": "de-synthesize-pro",
+      "source": "./",
+      "description": "Removes the synthetic/AI look from generated portraits: builds a film-development edit prompt and runs it end-to-end on Higgsfield with Nano Banana 2.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Jay Piddy"
+      }
+    }
+  ]
+}
