@@ -1,6 +1,6 @@
 # De-Synthesize Pro
 
-A Claude Code plugin that removes the synthetic/plastic "AI look" from generated portraits. It builds a film-development edit prompt — real film-stock color science, skin-texture reconstruction, and ISO grain — and runs it **end-to-end on Higgsfield** with Nano Banana 2 (image-to-image), delivering the developed image.
+A Claude Code plugin that removes the synthetic/plastic "AI look" from generated portraits. It builds a film-development edit prompt — real film-stock color science, skin-texture reconstruction, and ISO grain — and runs it **end-to-end on Higgsfield** with Nano Banana 2.1 (image-to-image), delivering the developed image.
 
 It's the skill version of the [De-Synthesize Pro app](https://github.com/jaypiddy/De-Synthesize-Pro), with the app UI stripped out and the prompt-assembly engine kept intact.
 
@@ -71,7 +71,7 @@ The image edit preserves the subject's identity, pose, lighting, props, and set 
 
 ## Models
 
-Defaults to `nano_banana_2`. Nano Banana Pro is available for maximum-fidelity / 4K work. GPT Image 2 is reachable on Higgsfield but the prompt language is **not yet calibrated** for it — the skill won't silently substitute it.
+Defaults to `nano_banana_2_1` (Nano Banana 2.1). Nano Banana Pro is available for maximum-fidelity / 4K work. GPT Image 2 is reachable on Higgsfield but the prompt language is **not yet calibrated** for it — the skill won't silently substitute it. Note the reference-media role differs by model: Nano Banana 2.1 and Pro use `image_references`, GPT Image 2 uses `image`.
 
 ## License
 

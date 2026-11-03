@@ -1,7 +1,7 @@
 {
   "name": "de-synthesize-pro",
   "version": "1.0.0",
-  "description": "Darkroom pipeline that removes the synthetic/AI look from generated portraits — builds a film-development edit prompt (film stock + skin texture recovery + ISO grain) and runs it end-to-end on Higgsfield with Nano Banana 2.",
+  "description": "Darkroom pipeline that removes the synthetic/AI look from generated portraits — builds a film-development edit prompt (film stock + skin texture recovery + ISO grain) and runs it end-to-end on Higgsfield with Nano Banana 2.1.",
   "author": {
     "name": "Jay Piddy"
   },

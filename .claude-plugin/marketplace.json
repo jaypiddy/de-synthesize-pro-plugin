@@ -10,7 +10,7 @@
     {
       "name": "de-synthesize-pro",
       "source": "./",
-      "description": "Removes the synthetic/AI look from generated portraits: builds a film-development edit prompt and runs it end-to-end on Higgsfield with Nano Banana 2.",
+      "description": "Removes the synthetic/AI look from generated portraits: builds a film-development edit prompt and runs it end-to-end on Higgsfield with Nano Banana 2.1.",
       "version": "1.0.0",
       "author": {
         "name": "Jay Piddy"

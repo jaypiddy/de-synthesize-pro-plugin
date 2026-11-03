@@ -1,13 +1,13 @@
 ---
 name: de-synthesize-pro
-description: "Run the De-Synthesize Pro darkroom pipeline END-TO-END via the Higgsfield MCP: take an AI-generated portrait, build a film-development edit prompt (film stock + skin texture recovery + ISO grain), and execute it with Nano Banana 2 (image-to-image) on Higgsfield, delivering the developed image. Trigger on: \"develop this image\", \"run it through the lab\", \"de-synthesize this with Higgsfield/Nano Banana\", \"develop as Portra/Tri-X/Cinestill\", \"give this the film treatment and generate it\", or any de-synthesize request where the user wants the result GENERATED (not just a prompt written). If the user only wants prompt text to paste elsewhere, or no Higgsfield MCP tools are available, use the sibling skill de-synthesize-portrait instead. Portraits of people only — not products or landscapes."
+description: "Run the De-Synthesize Pro darkroom pipeline END-TO-END via the Higgsfield MCP: take an AI-generated portrait, build a film-development edit prompt (film stock + skin texture recovery + ISO grain), and execute it with Nano Banana 2.1 (image-to-image) on Higgsfield, delivering the developed image. Trigger on: \"develop this image\", \"run it through the lab\", \"de-synthesize this with Higgsfield/Nano Banana\", \"develop as Portra/Tri-X/Cinestill\", \"give this the film treatment and generate it\", or any de-synthesize request where the user wants the result GENERATED (not just a prompt written). If the user only wants prompt text to paste elsewhere, or no Higgsfield MCP tools are available, use the sibling skill de-synthesize-portrait instead. Portraits of people only — not products or landscapes."
 ---
 
 # De-Synthesize Pro (Higgsfield execution skill)
 
 The skill version of the De-Synthesize Pro app (github.com/jaypiddy/De-Synthesize-Pro): removes the synthetic/plastic AI look from a generated portrait by reconstructing skin texture and applying real film-stock color science + grain, then **actually runs the edit** on Higgsfield. This is an image EDIT — the person's identity, pose, lighting, props, and set must survive unchanged.
 
-**Default engine: `nano_banana_2`.** This skill's prompt language is calibrated for the Nano Banana (Gemini image) family. Other models (GPT Image 2, Soul) respond differently to the same prompts — see "Model selection" before switching.
+**Default engine: `nano_banana_2_1` (Nano Banana 2.1).** This skill's prompt language is calibrated for the Nano Banana (Gemini image) family. Other models (GPT Image 2, Soul) respond differently to the same prompts — see "Model selection" before switching.
 
 ## The four knobs
 
@@ -53,33 +53,33 @@ Aspect ratio and resolution are generation parameters, never text in the prompt.
    - **Local file, Apps UI client (claude.ai / desktop app):** call `media_upload_widget` (type: image) immediately — do not ask the user to attach the image in chat; remote MCP tools can't read chat attachments. The widget returns a `media_id`.
    - **Local file, CLI/Claude Code session:** call `media_upload` with the filename to get a presigned URL, PUT the bytes (curl), then `media_confirm` to get the `media_id`.
    - **Web URL:** call `media_import_url`; pass the returned `media_id`. Never pass an https:// URL in `medias[].value`.
-2. **Detect the aspect ratio.** Read the source dimensions (locally: `sips -g pixelWidth -g pixelHeight <file>`; otherwise ask or eyeball from the widget preview) and pick the CLOSEST ratio Nano Banana supports: 1:1, 3:2, 2:3, 4:3, 3:4, 4:5, 5:4, 9:16, 16:9, 21:9. Matching the source ratio is the default behavior — don't silently letterbox a 3:4 portrait into 1:1.
+2. **Detect the aspect ratio.** Read the source dimensions (locally: `sips -g pixelWidth -g pixelHeight <file>`; otherwise ask or eyeball from the widget preview) and pick the CLOSEST ratio Nano Banana 2.1 supports: `auto`, 1:1, 3:2, 2:3, 4:3, 3:4, 4:5, 5:4, 9:16, 16:9, 21:9 (plus panorama ratios 4:1, 1:4, 8:1, 1:8). Prefer `auto` to let the model keep the source framing; otherwise pick the closest explicit ratio. Matching the source ratio is the default behavior — don't silently letterbox a 3:4 portrait into 1:1.
 3. **Confirm settings before generating.** Every Higgsfield job costs credits — no trial runs. State the recipe in darkroom terms ("Developing as Kodak Portra 400 @ ISO 400, 50% texture recovery, 3:4, 1k — good?") and, for 2k/4k or multi-image runs, preflight with `generate_image` + `get_cost: true` first.
 4. **Generate:**
    ```
    generate_image {
      params: {
-       model: "nano_banana_2",
+       model: "nano_banana_2_1",
        prompt: <assembled prompt>,
-       medias: [{ value: <media_id>, role: "image" }],
-       aspect_ratio: <detected>,
+       medias: [{ value: <media_id>, role: "image_references" }],
+       aspect_ratio: <detected, or "auto">,
        resolution: <1k|2k|4k>
      }
    }
    ```
-   If the tool result returns a `recovery_tool`, call it immediately.
+   ⚠️ **Nano Banana 2.1 takes the source image under role `image_references`, not `image`** (the old 2.0 role). Wrong role = the reference is ignored or the call fails. Optional 2.1 params: `thinking_level` (minimal/medium/high, default medium — raise to `high` for tricky skin/lighting), `seed` (for reproducible results), `is_inpaint` + a `mask`-role media (to restrict the edit to a masked region). If the tool result returns a `recovery_tool`, call it immediately.
 5. **Deliver.** Show the result and give the user the image URL. Offer to save it locally with the app's filename convention: `<Stock-Slug>-iso<ISO>-<YYYYMMDD-HHMMSS>.png` (e.g. `Kodak-Portra-400-iso400-20260717-143000.png`).
 6. **Contact sheet (optional).** If the user wants to compare stocks, run one generation per stock with all other knobs held constant — but confirm first, since each frame is a separate charged job.
 
 ## Model selection
 
-| Model | When | Notes |
-|---|---|---|
-| `nano_banana_2` (default) | Standard development runs | Fast, high quality, this skill's prompt dialect is tuned for it |
-| `nano_banana_pro` | User asks for maximum fidelity / 4k print work | Same prompt dialect, slower, costlier |
-| `gpt_image_2` | NOT YET CALIBRATED | Available on Higgsfield (1k/2k/4k, quality tiers). Different prompt dialect — GPT Image tends to interpret texture instructions more literally and drift identity more on edits. Do not silently substitute it; if the user asks for it, warn that the recipe language hasn't been tuned for it yet and results will differ from the Nano Banana baseline. Calibrate as a future variant of this skill. |
+| Model | Reference role | When | Notes |
+|---|---|---|---|
+| `nano_banana_2_1` (default) | `image_references` | Standard development runs | Nano Banana 2.1 — fast, high quality, this skill's prompt dialect is tuned for it. Adds `auto` aspect ratio + `thinking_level`/`seed`/inpaint params over 2.0. |
+| `nano_banana_pro` | `image_references` | Maximum fidelity / 4k print work | Same prompt dialect, slower, costlier; defaults to 2k. No `thinking_level`/inpaint params. |
+| `gpt_image_2` | `image` | NOT YET CALIBRATED | OpenAI, 1k/2k/4k + low/medium/high quality tiers. **Note the reference role is `image`, not `image_references`.** Different prompt dialect — GPT Image interprets texture instructions more literally and drifts identity more on edits. Don't silently substitute it; if asked, warn the recipe isn't tuned for it yet and results will differ from the Nano Banana baseline. Calibrate as a future variant of this skill. |
 
-The whole point of per-model calibration: identical prompts produce different results per engine. When a new model variant is tuned, record its dialect adjustments in this file rather than forking the skill.
+The whole point of per-model calibration: identical prompts produce different results per engine. The reference-media role also differs by model (see table) — always use the role that model's catalog entry lists. When a new model variant is tuned, record its dialect adjustments in this file rather than forking the skill.
 
 ## Handling rejections
 
