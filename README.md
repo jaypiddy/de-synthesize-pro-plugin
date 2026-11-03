@@ -12,11 +12,11 @@ It's the skill version of the [De-Synthesize Pro app](https://github.com/jaypidd
 ## Install
 
 ```
-/plugin marketplace add jaypiddy/de-synthesize-pro
+/plugin marketplace add jaypiddy/de-synthesize-pro-plugin
 /plugin install de-synthesize-pro@de-synthesize-pro
 ```
 
-The first command registers this repo as a plugin marketplace; the second installs the plugin from it. (`de-synthesize-pro@de-synthesize-pro` = the plugin name @ the marketplace name — they happen to match here.)
+The first command registers this repo as a plugin marketplace; the second installs the plugin from it. (`de-synthesize-pro@de-synthesize-pro` = the plugin name @ the marketplace name — both are `de-synthesize-pro`; only the repo itself is named `de-synthesize-pro-plugin`.)
 
 To update later:
 
